@@ -37,6 +37,13 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        'database' => [
+            'driver' => 'local',
+            'root' => database_path(),
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
 
         'public' => [
             'driver' => 'local',
