@@ -1,7 +1,7 @@
 // columns.tsx
 import { ColumnDef, HeaderContext, CellContext } from "@tanstack/react-table";
 import React from "react";
-import {getBasicCell, getSortingHeader} from "@/components/data-tables/countries/index";
+import {getBasicCell, getSortingHeader} from "@/components/data-tables";
 import {Checkbox} from "@/components/ui/checkbox";
 import {indeterminateState} from "@/components/data-tables";
 

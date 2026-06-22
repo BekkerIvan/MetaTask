@@ -6,7 +6,6 @@ import {
     useReactTable,
     SortingState,
     getSortedRowModel,
-    Column,
     RowSelectionState
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -19,14 +18,6 @@ interface DataTableProps<TData, TValue> {
     order?: string;
     direction?: "asc" | "desc";
     onSort?: (columnId: string) => void;
-}
-
-export function getSortingHeader<TData, TValue>(column: Column<TData, TValue>): React.JSX.Element {
-    return <span className="capitalize">{column.id}</span>
-}
-
-export function getBasicCell(row: string, className: string = ""): React.JSX.Element {
-    return <span className={className}>{row}</span>
 }
 
 export function DataTable<TData, TValue>({ columns, data, order, direction, onSort }: DataTableProps<TData, TValue>) {
