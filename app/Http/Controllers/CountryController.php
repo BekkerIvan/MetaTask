@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Continent;
 use App\Models\Country;
+use App\Models\Tag;
+use App\Services\ComboboxMappingService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Continent;
 
 class CountryController extends Controller
 {
@@ -14,33 +16,61 @@ class CountryController extends Controller
      */
     public function index(Request $request)
     {
-        $search = trim((string) $request->query('search', ''));
+        $search = $this->search($request);
+        $order = $this->orderBy($request);
+        $direction = $this->orderDirection($request);
+        $itemsPerPage = $this->itemsPerPage($request);
         $continent = $request->query('continent');
+        $tags = $request->query('tags');
 
-        $countries = Country::query()
+        $countries = Country::select(['id', 'name', 'code', 'capital', 'continent_id'])
             ->with('continent:id,name')
-            ->when($search !== '', function ($query) use ($search) {
+            ->with('tags:name')
+            ->when(! empty($search), function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('capital', 'like', "%{$search}%")
-                        ->orWhereHas('continent', function ($query) use ($search) {
-                            $query->where('name', 'like', "%{$search}%");
+                    $searchWildcard = "%{$search}%";
+                    $query->whereLike('name', $searchWildcard)
+                        ->orWhereLike('capital', $searchWildcard)
+                        ->orWhereHas('continent', function ($query) use ($searchWildcard) {
+                            $query->whereLike('name', $searchWildcard);
                         });
                 });
             })
             ->when($continent, function ($query) use ($continent) {
                 $query->whereRelation('continent', 'name', $continent);
             })
-            ->orderBy('name')
-            ->paginate(20)
-            ->withQueryString();
+            ->when($tags, function ($query) use ($tags) {
+                $query->whereHas('tags', function ($query) use ($tags) {
+                    $query->whereIn('name', $tags);
+                });
+            })
+            ->orderBy($order, $direction)
+            ->paginate($itemsPerPage)
+            ->through(fn ($country) => [
+                'id' => $country->id,
+                'name' => $country->name,
+                'code' => $country->code,
+                'capital' => $country->capital,
+                'continent' => $country->continent->name,
+            ]);
+
+        $comboboxMappingService = new ComboboxMappingService;
 
         return Inertia::render('welcome', [
             'countries' => $countries,
             'continents' => Continent::query()->orderBy('name')->pluck('name', 'id'),
+            'tag_options' => $comboboxMappingService->fromQuery(
+                Tag::query()->orderBy('name'),
+                valueKey: 'name',
+                extraKeys: ['color'],
+            ),
             'filters' => [
                 'search' => $search,
                 'continent' => $continent,
+                'order' => $order,
+                'per_page' => $itemsPerPage,
+                'direction' => $direction,
+                'items_per_page' => [10, 20, 50, 100],
             ],
         ]);
     }
