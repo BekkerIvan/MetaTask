@@ -43,7 +43,7 @@ export function DataTable<TData, TValue>({ columns, data, order, direction, onSo
         onRowSelectionChange: setRowSelection,
         state: {
             sorting,
-            rowSelection
+            rowSelection,
         },
     });
 

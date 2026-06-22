@@ -2,8 +2,8 @@
 import { ColumnDef, HeaderContext, CellContext } from "@tanstack/react-table";
 import React from "react";
 import {getBasicCell, getSortingHeader} from "@/components/data-tables/countries/index";
-import {Input} from "@/components/ui/input";
 import {Checkbox} from "@/components/ui/checkbox";
+import {indeterminateState} from "@/components/data-tables";
 
 declare module "@tanstack/react-table" {
     interface ColumnMeta<TData, TValue> {
@@ -24,10 +24,20 @@ const muted = "text-[#706f6c] dark:text-[#A1A09A]";
 export const columns: ColumnDef<Country>[] = [
     {
         id: "select",
-        header: "",
+        header: ({ table }) => (
+            <Checkbox
+                checked={indeterminateState(table)}
+                onCheckedChange={(checked) =>
+                    table.getToggleAllRowsSelectedHandler()({
+                        target: { checked: checked === true }
+                    })
+                }
+            />
+        ),
         cell: ({ row }) => (
             <Checkbox
                 checked={row.getIsSelected()}
+                disabled={!row.getCanSelect()}
                 onCheckedChange={row.getToggleSelectedHandler()}
             />
         ),
