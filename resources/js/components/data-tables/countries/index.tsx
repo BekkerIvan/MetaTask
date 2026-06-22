@@ -9,8 +9,8 @@ import {
     RowSelectionState
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {Button} from "@/components/ui/button";
-import React, {useState} from "react";
+import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -39,11 +39,11 @@ export function DataTable<TData, TValue>({ columns, data, order, direction, onSo
     });
 
     return (
-        <div className="overflow-hidden rounded-lg border border-[#e3e3e0] dark:border-[#3E3E3A]">
+        <div className="overflow-hidden rounded-lg border border-border">
             <Table>
-                <TableHeader className="bg-white text-xs tracking-wide text-[#706f6c] uppercase dark:bg-[#161615] dark:text-[#A1A09A]">
+                <TableHeader className="bg-muted/50 text-xs tracking-wide text-muted-foreground uppercase">
                     {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id} className="hover:bg-none!">
+                        <TableRow key={headerGroup.id} className="hover:bg-transparent">
                             {headerGroup.headers.map((header) => {
                                 const sortable = header.column.columnDef.meta?.sortable;
                                 const isActive = order === header.column.id;
@@ -51,13 +51,14 @@ export function DataTable<TData, TValue>({ columns, data, order, direction, onSo
                                 return (
                                     <TableHead key={header.id} className="px-4 py-3 font-medium">
                                         {header.isPlaceholder ? null : sortable ? (
-                                            <Button type="button"
-                                                    variant="ghost"
-                                                    className="py-1"
-                                                    onClick={() => onSort?.(header.column.id)}
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                className={`-ml-4 h-8 py-1 hover:bg-transparent hover:text-foreground ${isActive ? 'text-foreground' : ''}`}
+                                                onClick={() => onSort?.(header.column.id)}
                                             >
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
-                                                <span className="w-3 text-[10px]">
+                                                <span className="ml-2 w-3 text-[10px]">
                                                     {isActive ? (direction === "asc" ? "▲" : "▼") : null}
                                                 </span>
                                             </Button>
@@ -75,7 +76,9 @@ export function DataTable<TData, TValue>({ columns, data, order, direction, onSo
                         table.getRowModel().rows.map((row) => (
                             <TableRow
                                 key={row.id}
-                                className="border-t border-[#e3e3e0] bg-white dark:border-[#3E3E3A] dark:bg-[#0a0a0a]"
+                                className="cursor-pointer transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                onClick={row.getToggleSelectedHandler()}
+                                data-state={row.getIsSelected() && "selected"}
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id} className="px-4 py-2">
@@ -86,8 +89,11 @@ export function DataTable<TData, TValue>({ columns, data, order, direction, onSo
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="px-4 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
-                                No countries match your search.
+                            <TableCell
+                                colSpan={columns.length}
+                                className="px-4 py-8 text-center text-muted-foreground"
+                            >
+                                No results found.
                             </TableCell>
                         </TableRow>
                     )}

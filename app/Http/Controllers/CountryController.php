@@ -58,7 +58,7 @@ class CountryController extends Controller
 
         return Inertia::render('welcome', [
             'countries' => $countries,
-            'continents' => Continent::query()->orderBy('name')->pluck('name', 'id'),
+            'continents' => Continent::query()->orderBy('name')->pluck('name'),
             'tag_options' => $comboboxMappingService->fromQuery(
                 Tag::query()->orderBy('name'),
                 valueKey: 'name',
