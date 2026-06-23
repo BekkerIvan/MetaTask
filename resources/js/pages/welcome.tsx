@@ -1,11 +1,11 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 import { index } from '@/actions/App/Http/Controllers/CountryController'
 import { Input } from "@/components/ui/input";
 
-import { columns } from '@/components/data-tables/countries/columns';
-import { DataTable } from '@/components/data-tables/countries';
+import { columns } from '@/components/country/data-tables/columns';
+import { DataTable } from '@/components/country/data-tables';
 import {
     Combobox,
     ComboboxChipsInput,
@@ -20,17 +20,11 @@ import {
     ComboboxInput,
 } from "@/components/ui/combobox";
 import React from "react";
-import ContinentSelect, {Continent} from "@/components/continent-select";
+import ContinentSelect, { Continent } from "@/components/continent-select";
 import ItemsPerPage from "@/components/items-per-page";
 import Pagination, { Link as PaginationLink} from "@/components/pagination";
-
-interface Country {
-    id: number;
-    name: string;
-    code: string | null;
-    capital: string | null;
-    continent: string | null;
-}
+import { Country } from "@/components/country";
+import { CountryDialog } from "@/components/country/dialogs";
 
 type TagOptions = {
     label: string;
@@ -69,6 +63,8 @@ export default function CountriesIndex({ countries, continents, tag_options, fil
     const [continent, setContinent] = useState(filters.continent ?? '');
     const [loading, setLoading] = useState(false);
     const [tags, setTags] = useState([]);
+
+    const [country, setCountry] = useState<Country|undefined>(undefined)
 
     useEffect(() => {
         const timeout = setTimeout(async () => {
@@ -175,7 +171,9 @@ export default function CountriesIndex({ countries, continents, tag_options, fil
                         order={order}
                         direction={direction}
                         onSort={toggleSort}
+                        onRowClick={(row: Country) => setCountry(row)}
                     />
+                    <CountryDialog country={country}/>
                     <Pagination links={countries.links}/>
                 </div>
             </div>

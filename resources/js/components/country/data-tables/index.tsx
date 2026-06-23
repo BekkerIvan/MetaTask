@@ -18,9 +18,10 @@ interface DataTableProps<TData, TValue> {
     order?: string;
     direction?: "asc" | "desc";
     onSort?: (columnId: string) => void;
+    onRowClick?: (row: TData) => void;
 }
 
-export function DataTable<TData, TValue>({ columns, data, order, direction, onSort }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, order, direction, onSort, onRowClick }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -77,7 +78,11 @@ export function DataTable<TData, TValue>({ columns, data, order, direction, onSo
                             <TableRow
                                 key={row.id}
                                 className="cursor-pointer transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                                onClick={row.getToggleSelectedHandler()}
+                                onClick={(event) => {
+                                    row.getToggleSelectedHandler();
+                                    if (event.target.getAttribute("role") === "checkbox") return;
+                                    onRowClick?.(row.original);
+                                }}
                                 data-state={row.getIsSelected() && "selected"}
                             >
                                 {row.getVisibleCells().map((cell) => (

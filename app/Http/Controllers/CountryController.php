@@ -46,12 +46,13 @@ class CountryController extends Controller
             })
             ->orderBy($order, $direction)
             ->paginate($itemsPerPage)
-            ->through(fn ($country) => [
+            ->through(fn (Country $country) => [
                 'id' => $country->id,
                 'name' => $country->name,
                 'code' => $country->code,
                 'capital' => $country->capital,
                 'continent' => $country->continent->name,
+                'tags' => $country->tags->pluck('name'),
             ]);
 
         $comboboxMappingService = new ComboboxMappingService;
@@ -96,7 +97,7 @@ class CountryController extends Controller
      */
     public function update(Request $request, Country $country)
     {
-        //
+        logger($country);
     }
 
     /**

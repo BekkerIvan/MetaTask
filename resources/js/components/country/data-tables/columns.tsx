@@ -5,18 +5,17 @@ import {getBasicCell, getSortingHeader} from "@/components/data-tables";
 import {Checkbox} from "@/components/ui/checkbox";
 import {indeterminateState} from "@/components/data-tables";
 
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Country } from "@/components/country";
+
 declare module "@tanstack/react-table" {
     interface ColumnMeta<TData, TValue> {
         sortable?: boolean;
     }
-}
-
-export interface Country {
-    id: number;
-    name: string;
-    code: string | null;
-    capital: string | null;
-    continent: string | null;
 }
 
 const muted = "text-[#706f6c] dark:text-[#A1A09A]";
@@ -66,5 +65,23 @@ export const columns: ColumnDef<Country>[] = [
         cell: ({ row }): React.JSX.Element => getBasicCell(row.original.continent ?? "—", muted),
         meta: { sortable: false },
 
+    },
+    {
+        accessorKey: "tags",
+        header: ({ column }: HeaderContext<Country, unknown>): React.JSX.Element => getSortingHeader(column),
+        cell: ({ row }): React.JSX.Element => {
+            if (! row.original.tags.length) return getBasicCell("0", muted)
+            return (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {getBasicCell(row.original.tags.length.toString(), muted)}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {row.original.tags.join(', ')}
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
+        meta: { sortable: false },
     },
 ];
