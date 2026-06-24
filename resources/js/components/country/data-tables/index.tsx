@@ -12,10 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import React, {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
-import ContinentSelect from "@/components/continent-select";
+import Continents from "@/components/continents";
 import ItemsPerPage from "@/components/items-per-page";
 import Tags from "@/components/tags";
-import {router} from "@inertiajs/react";
 import {index} from "@/actions/App/Http/Controllers/CountryController";
 import Pagination, { Link as PaginationLink } from "@/components/pagination";
 import {Country} from "@/components/country";
@@ -74,7 +73,6 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
         fetchData()
             .then(response => response.json())
             .then(data => setData(data.data))
-
         return () => {}
     }, [search, continent, order, direction, perPage, tags]);
 
@@ -115,7 +113,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search by name or capital…"
                 />
-                <ContinentSelect onSelect={(value) => setContinent(value)}/>
+                <Continents preload={true} onContinentChange={(value) => setContinent(value)}/>
                 <ItemsPerPage setValue={(value: string) => setPerPage(value)}/>
                 <Tags preload={true} onTagsChange={(tags: string[]) => setTags(tags)}/>
             </div>

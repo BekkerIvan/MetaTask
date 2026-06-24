@@ -22,7 +22,7 @@ interface Props {
     name?: string;
     value?: string;
 }
-export function Continents({continents = [], preload = false, name, disabled = false, onContinentChange, value}: Props) {
+export default function Continents({continents = [], preload = false, name, disabled = false, onContinentChange, value}: Props) {
     const [continentOptions, setContinentOptions] = useState<ContinentOption[]>(continents);
 
     useEffect(() => {

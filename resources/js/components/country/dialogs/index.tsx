@@ -20,7 +20,7 @@ import { Errors } from "@inertiajs/core";
 import {TrashIcon} from "lucide-react";
 import { MouseEventHandler, useEffect, useState } from "react";
 import { RouteDefinition } from "@/wayfinder";
-import {Continents} from "@/components/continents";
+import Continents from "@/components/continents";
 import {ConfirmationDialog} from "@/components/confirmation-dialog";
 import {router} from "@inertiajs/react";
 
