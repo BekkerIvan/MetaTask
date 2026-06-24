@@ -1,8 +1,8 @@
 export interface Country {
-    id: number;
+    id?: number;
     name: string;
-    code: string | null;
-    capital: string | null;
-    continent: string | null;
+    code?: string;
+    capital?: string;
+    continent?: string;
     tags: string[]
 }

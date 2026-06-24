@@ -3,11 +3,11 @@ import { Select, SelectTrigger, SelectContent, SelectGroup, SelectItem, SelectVa
 
 export type ItemPerPage = string;
 interface Props {
-    itemsPerPage: Array<ItemPerPage>;
+    itemsPerPage?: Array<ItemPerPage>;
     value?: ItemPerPage;
     setValue?: (value: ItemPerPage) => void
 }
-export default function ItemsPerPage({ itemsPerPage, value, setValue }: Props) {
+export default function ItemsPerPage({ itemsPerPage = ["10", "20", "50", "100"], value, setValue }: Props) {
     return (
         <Select onValueChange={(value: ItemPerPage): void|undefined => setValue?.(value)} value={value}>
             <SelectTrigger className="w-1/10">

@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Continent;
 use App\Models\Country;
-use App\Models\Tag;
-use App\Services\ComboboxMappingService;
+use App\Validation\CountryValidation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Response;
 
 class CountryController extends Controller
 {
@@ -51,28 +51,13 @@ class CountryController extends Controller
                 'name' => $country->name,
                 'code' => $country->code,
                 'capital' => $country->capital,
-                'continent' => $country->continent->name,
-                'tags' => $country->tags->pluck('name'),
+                'continent' => $country->continent?->name,
+                'tags' => $country->tags?->pluck('name'),
             ]);
 
-        $comboboxMappingService = new ComboboxMappingService;
 
-        return Inertia::render('welcome', [
-            'countries' => $countries,
-            'continents' => Continent::query()->orderBy('name')->pluck('name'),
-            'tag_options' => $comboboxMappingService->fromQuery(
-                Tag::query()->orderBy('name'),
-                valueKey: 'name',
-                extraKeys: ['color'],
-            ),
-            'filters' => [
-                'search' => $search,
-                'continent' => $continent,
-                'order' => $order,
-                'per_page' => $itemsPerPage,
-                'direction' => $direction,
-                'items_per_page' => [10, 20, 50, 100],
-            ],
+        return Response::json([
+            'data' => $countries,
         ]);
     }
 
@@ -81,7 +66,14 @@ class CountryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate(CountryValidation::rules());
+
+        $data['continent_id'] = Continent::where('name', $data['continent'])->value('id');
+        unset($data['continent']);
+
+        Country::create($data);
+
+        return Inertia::back();
     }
 
     /**
@@ -97,7 +89,14 @@ class CountryController extends Controller
      */
     public function update(Request $request, Country $country)
     {
-        logger($country);
+        $data = $request->validate(CountryValidation::rules($country));
+
+        $data['continent_id'] = Continent::where('name', $data['continent'])->value('id');
+        unset($data['continent']);
+
+        $country->update($data);
+
+        return Inertia::back();
     }
 
     /**
@@ -105,6 +104,8 @@ class CountryController extends Controller
      */
     public function destroy(Country $country)
     {
-        //
+        $country->delete();
+
+        return Inertia::back();
     }
 }
