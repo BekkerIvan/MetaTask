@@ -17,7 +17,6 @@ import ItemsPerPage from "@/components/items-per-page";
 import Tags from "@/components/tags";
 import {index} from "@/actions/App/Http/Controllers/CountryController";
 import Pagination, { Link as PaginationLink } from "@/components/pagination";
-import {Country} from "@/components/country";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -36,7 +35,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
     const [sorting, setSorting] = useState<SortingState>([]);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-    const [data, setData] = useState<PaginatedData<Country>>({
+    const [data, setData] = useState<PaginatedData<TData>>({
         data: [],
         links: [],
         current_page: 0,
@@ -44,6 +43,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
         total: 0
     });
 
+    const [searchInput, setSearchInput] = useState<string | undefined>(undefined);
     const [search, setSearch] = useState<string | undefined>(undefined);
     const [order, setOrder] = useState<string | undefined>(undefined);
     const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
@@ -51,7 +51,13 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
     const [continent, setContinent] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
     const [tags, setTags] = useState<string[]>([]);
+    const [page, setPage] = useState<number>(1);
 
+
+    useEffect(() => {
+        const timer = setTimeout(() => setSearch(searchInput), 300);
+        return () => clearTimeout(timer);
+    }, [searchInput]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -62,7 +68,8 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                 direction,
                 per_page: perPage,
                 continent,
-                tags
+                tags,
+                page
             }
         }));
         setLoading(false);
@@ -74,7 +81,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
             .then(response => response.json())
             .then(data => setData(data.data))
         return () => {}
-    }, [search, continent, order, direction, perPage, tags]);
+    }, [search, continent, order, direction, perPage, tags, page]);
 
 
     const toggleSort = (column: string) => {
@@ -109,8 +116,8 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
         <>
             <div className="mb-4 flex flex-col gap-3 sm:flex-row">
                 <Input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                     placeholder="Search by name or capital…"
                 />
                 <Continents preload={true} onContinentChange={(value) => setContinent(value)}/>
@@ -182,7 +189,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                     </TableBody>
                 </Table>
             </div>
-            <Pagination links={data.links}/>
+            <Pagination links={data.links} onClick={(link) => setPage(link.page ?? 1)}/>
         </>
     );
 }

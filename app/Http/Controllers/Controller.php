@@ -30,4 +30,9 @@ abstract class Controller
     {
         return (int) $this->query($request, 'per_page', $default);
     }
+
+    protected function page(Request $request, $default = 1): int
+    {
+        return (int) $this->query($request, 'page', $default);
+    }
 }

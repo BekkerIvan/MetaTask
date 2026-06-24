@@ -22,6 +22,7 @@ class CountryController extends Controller
         $itemsPerPage = $this->itemsPerPage($request);
         $continent = $request->query('continent');
         $tags = $request->query('tags');
+        $page = $this->page($request);
 
         $countries = Country::select(['id', 'name', 'code', 'capital', 'continent_id'])
             ->with('continent:id,name')
@@ -45,7 +46,7 @@ class CountryController extends Controller
                 });
             })
             ->orderBy($order, $direction)
-            ->paginate($itemsPerPage)
+            ->paginate($itemsPerPage, page: $page)
             ->through(fn (Country $country) => [
                 'id' => $country->id,
                 'name' => $country->name,

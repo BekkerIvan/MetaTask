@@ -1,5 +1,6 @@
 import {Link} from "@inertiajs/react";
-import React from "react";
+import React, {MouseEventHandler} from "react";
+import {Button} from "@/components/ui/button";
 
 export type Link = {
     active: boolean;
@@ -8,18 +9,18 @@ export type Link = {
     url: string|null;
 }
 interface Props {
-    links: Link[]
+    links: Link[],
+    onClick?: (link: Link) => void
 }
-export default function Pagination({ links }: Props) {
+export default function Pagination({ links, onClick }: Props) {
     return (
         <div className="mt-4 flex flex-wrap gap-1">
             {links.map((link: Link, index: number) => (
-                <Link
+                <Button
+                    variant="ghost"
                     key={index}
-                    href={link.url ?? '#'}
-                    preserveState
-                    preserveScroll
-                    className={`rounded-md px-3 py-1 text-sm transition-colors ${
+                    onClick={() => onClick?.(link)}
+                    className={`rounded-md px-3 py-1 text-sm transition-colors cursor-pointer ${
                         link.active
                             ? 'bg-primary text-primary-foreground'
                             : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
