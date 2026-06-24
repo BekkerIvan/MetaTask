@@ -41,7 +41,7 @@ export default function Continents({continents = [], preload = false, name, disa
 
     return (
         <Select name={name} disabled={disabled} onValueChange={(continent) => onContinentChange?.(continent)} value={value}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger>
                 <SelectValue placeholder="Select a Continent" />
             </SelectTrigger>
             <SelectContent>

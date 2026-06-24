@@ -121,7 +121,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                     placeholder="Search by name or capital…"
                 />
                 <Continents preload={true} onContinentChange={(value) => setContinent(value)}/>
-                <ItemsPerPage setValue={(value: string) => setPerPage(value)}/>
+                <ItemsPerPage value={perPage} setValue={(value: string) => setPerPage(value)}/>
                 <Tags preload={true} onTagsChange={(tags: string[]) => setTags(tags)}/>
             </div>
             <div className="overflow-hidden rounded-lg border border-border">

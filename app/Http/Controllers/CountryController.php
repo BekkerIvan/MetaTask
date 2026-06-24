@@ -34,6 +34,9 @@ class CountryController extends Controller
                         ->orWhereLike('capital', $searchWildcard)
                         ->orWhereHas('continent', function ($query) use ($searchWildcard) {
                             $query->whereLike('name', $searchWildcard);
+                        })
+                        ->orWhereHas('tags', function ($query) use ($searchWildcard) {
+                            $query->whereLike('name', $searchWildcard);
                         });
                 });
             })
@@ -55,7 +58,6 @@ class CountryController extends Controller
                 'continent' => $country->continent?->name,
                 'tags' => $country->tags?->pluck('name'),
             ]);
-
 
         return Response::json([
             'data' => $countries,

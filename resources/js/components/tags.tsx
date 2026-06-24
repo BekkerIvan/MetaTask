@@ -57,7 +57,7 @@ export default function Tags({ preload = false, onTagsChange, tags = [], anchorR
             onValueChange={(tags: string[]) => onTagsChange?.(tags)}
             modal={true}
         >
-            <ComboboxChips ref={anchor} className="w-full shrink-0">
+            <ComboboxChips ref={anchor} className="shrink-0">
                 <ComboboxValue>
                     {(values) => (
                         <React.Fragment>
