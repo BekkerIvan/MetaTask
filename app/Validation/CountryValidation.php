@@ -15,7 +15,7 @@ abstract class CountryValidation
             'capital' => 'string|nullable',
             'continent' => 'string|exists:continents,name|nullable',
             'tags' => 'array',
-            'tags.*' => 'exists:tags',
+            'tags.*' => 'exists:tags,name',
         ];
     }
 }

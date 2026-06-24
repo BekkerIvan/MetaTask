@@ -15,7 +15,7 @@ import {Input} from "@/components/ui/input";
 import Continents from "@/components/continents";
 import ItemsPerPage from "@/components/items-per-page";
 import TagSelection from "@/components/tag-selection";
-import {index} from "@/actions/App/Http/Controllers/CountryController";
+import { index } from "@/actions/App/Http/Controllers/TagController";
 import Pagination, { Link as PaginationLink } from "@/components/pagination";
 
 interface DataTableProps<TData, TValue> {
@@ -31,7 +31,7 @@ interface PaginatedData<TData> {
     total: number;
 }
 
-export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps<TData, TValue>) {
+export default function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -48,9 +48,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
     const [order, setOrder] = useState<string | undefined>(undefined);
     const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
     const [perPage, setPerPage] = useState<string>("20");
-    const [continent, setContinent] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
-    const [tags, setTags] = useState<string[]>([]);
     const [page, setPage] = useState<number>(1);
 
 
@@ -67,8 +65,6 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                 order,
                 direction,
                 per_page: perPage,
-                continent,
-                tags,
                 page
             }
         }));
@@ -81,7 +77,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
             .then(response => response.json())
             .then(data => setData(data.data))
         return () => {}
-    }, [search, continent, order, direction, perPage, tags, page]);
+    }, [search, order, direction, perPage, page]);
 
 
     const toggleSort = (column: string) => {
@@ -118,11 +114,9 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                 <Input
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    placeholder="Search by name or capital…"
+                    placeholder="Search by name or color…"
                 />
-                <Continents preload={true} onContinentChange={(value) => setContinent(value)}/>
                 <ItemsPerPage value={perPage} setValue={(value: string) => setPerPage(value)}/>
-                <TagSelection preload={true} onTagsChange={(tags: string[]) => setTags(tags)}/>
             </div>
             <div className="overflow-hidden rounded-lg border border-border">
                 <Table>

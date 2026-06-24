@@ -49,6 +49,7 @@ export default function FormWrapper<TFields extends FormDataType<TFields>>({
                                                                                children,
                                                                                className,
                                                                            }: FormWrapperProps<TFields>) {
+
     const form = useForm<TFields>(initialValues);
 
     // React.FormEvent is the non-deprecated replacement for FormEventHandler
@@ -58,15 +59,14 @@ export default function FormWrapper<TFields extends FormDataType<TFields>>({
 
         const submitOptions: UseFormSubmitOptions = {
             onSuccess: () => onSuccess?.(),
-            onError: (errors: Errors) => onError?.(errors),
-            onBefore: params => console.log(params)
+            onError: (errors: Errors) => onError?.(errors)
         };
 
         form[method]?.(url, submitOptions);
     };
 
     return (
-        <FormContext.Provider value={{ form } as unknown as FormContextValue<FormDataType<object>>}>
+        <FormContext.Provider value={{ form }}>
             <form onSubmit={handleSubmit} className={className}>
                 {typeof children === "function"
                     ? (children as (form: InertiaFormProps<TFields>) => ReactNode)(form)

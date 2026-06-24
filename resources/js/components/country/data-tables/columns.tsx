@@ -1,4 +1,3 @@
-// columns.tsx
 import { ColumnDef, HeaderContext, CellContext } from "@tanstack/react-table";
 import React from "react";
 import {getBasicCell, getSortingHeader} from "@/components/data-tables";

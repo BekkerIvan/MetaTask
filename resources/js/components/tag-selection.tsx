@@ -12,7 +12,7 @@ import {
     ComboboxInput,
 } from "@/components/ui/combobox";
 import React, {useEffect, useState} from "react";
-import { index } from "@/actions/App/Http/Controllers/TagController";
+import { filter } from "@/actions/App/Http/Controllers/TagController";
 
 
 interface Props<T> {
@@ -22,6 +22,7 @@ interface Props<T> {
     anchorRef?: React.RefObject<T>;
     disabled?: boolean;
     name?: string;
+    value?: string[];
 }
 
 export type TagOptions = {
@@ -30,14 +31,13 @@ export type TagOptions = {
     color: string;
 };
 
-
-export default function Tags({ preload = false, onTagsChange, tags = [], anchorRef, disabled = false, name }: Props<HTMLDivElement | null>) {
-    const anchor: React.RefObject<HTMLDivElement | null> = anchorRef || useComboboxAnchor();
+export default function TagSelection({ preload = false, onTagsChange, tags = [], anchorRef, disabled = false, name, value }: Props<HTMLDivElement | null>) {
+    const anchor = anchorRef ?? useComboboxAnchor();
     const [tagOptions, setTagOptions] = useState<TagOptions[]>(tags);
 
     useEffect(() => {
         if (preload) {
-            fetch(index.url())
+            fetch(filter.url())
                 .then((response) => response.json())
                 .then((data) => {
                     setTagOptions(data.tags);
@@ -55,22 +55,23 @@ export default function Tags({ preload = false, onTagsChange, tags = [], anchorR
             autoHighlight
             items={tagOptions}
             onValueChange={(tags: string[]) => onTagsChange?.(tags)}
-            modal={true}
+            value={value}
         >
-            <ComboboxChips ref={anchor} className="shrink-0">
+            <ComboboxChips ref={anchor} className="shrink-0 w-60">
                 <ComboboxValue>
-                    {(values) => (
+                    {(selectedValues: string[]) => (
                         <React.Fragment>
-                            {values.map((value: string) => (
-                                <ComboboxChip key={value}>{value}</ComboboxChip>
-                            ))}
-                            <ComboboxChipsInput placeholder="Tags" />
+                            {selectedValues.map((val) => {
+                                const label = tagOptions.find((t) => String(t.value) === String(val))?.label ?? val;
+                                return <ComboboxChip key={val}>{label}</ComboboxChip>;
+                            })}
+                            <ComboboxChipsInput placeholder="TagSelection" />
                         </React.Fragment>
                     )}
                 </ComboboxValue>
             </ComboboxChips>
-            <ComboboxContent className="">
-                <ComboboxEmpty>No Tags found.</ComboboxEmpty>
+            <ComboboxContent anchor={anchor}>
+                <ComboboxEmpty>No TagSelection found.</ComboboxEmpty>
                 <ComboboxInput name={name} showTrigger={false} placeholder="Search Tag" disabled={disabled}/>
                 <ComboboxList>
                     {(tagOption: TagOptions) => (

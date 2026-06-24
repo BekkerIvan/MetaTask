@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Continent;
 use App\Models\Country;
+use App\Models\Tag;
 use App\Validation\CountryValidation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -74,7 +75,10 @@ class CountryController extends Controller
         $data['continent_id'] = Continent::where('name', $data['continent'])->value('id');
         unset($data['continent']);
 
-        Country::create($data);
+        $tagIds = Tag::whereIn('name', $data['tags'])->pluck('id');
+
+        $country = Country::create($data);
+        $country->tags()->sync($tagIds);
 
         return Inertia::back();
     }
@@ -97,7 +101,10 @@ class CountryController extends Controller
         $data['continent_id'] = Continent::where('name', $data['continent'])->value('id');
         unset($data['continent']);
 
+        $tagIds = Tag::whereIn('name', $data['tags'])->pluck('id');
+
         $country->update($data);
+        $country->tags()->sync($tagIds);
 
         return Inertia::back();
     }

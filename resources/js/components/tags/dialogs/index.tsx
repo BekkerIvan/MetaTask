@@ -5,75 +5,74 @@ import {
     DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogTitle
 } from "@/components/ui/dialog";
-import { Country } from "@/components/country";
-import { destroy, store, update } from "@/actions/App/Http/Controllers/CountryController";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import FormWrapper from "@/components/form-wrapper";
-import { Errors } from "@inertiajs/core";
-import { useEffect, useState } from "react";
-import { RouteDefinition } from "@/wayfinder";
+import {toast} from "sonner";
+import {Tag} from "@/components/tags";
+import {Button} from "@/components/ui/button";
 import {ConfirmationDialog} from "@/components/confirmation-dialog";
+import {useEffect, useState} from "react";
+import {RouteDefinition} from "@/wayfinder";
+import { store, update, destroy } from "@/actions/App/Http/Controllers/TagController";
 import {router} from "@inertiajs/react";
+import {Country} from "@/components/country";
+import {Errors} from "@inertiajs/core";
+import TagForm from "@/components/tags/dialogs/tag-form";
 import {DeleteButton, SubmitButton} from "@/components/dialogs";
-import CountryForm from "@/components/country/dialogs/country-form";
+
 
 
 interface Props {
-    country?: Country;
+    tag?: Tag;
     open?: boolean;
     onClose: () => void;
-    onSuccess?: (data: Country) => void;
+    onSuccess?: (data: Tag) => void;
     onError?: (errors: Errors) => void;
 }
 
-export function CountryDialog({ country, open = false, onClose, onSuccess, onError }: Props) {
-    const isEditing = Boolean(country?.id);
+export default function TagDialog({ tag, open = false, onClose, onSuccess, onError }: Props) {
+    const isEditing = Boolean(tag?.id);
 
     const [action, setAction] = useState<RouteDefinition<"post" | "put">>(store());
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     useEffect(() => {
-        if (isEditing && country?.id) {
-            setAction(update({ country: country?.id }))
+        if (isEditing && tag?.id) {
+            setAction(update({ tag: tag?.id }))
         } else {
             setAction(store());
         }
-    }, [country]);
+    }, [tag]);
 
     const handleDestroy = (): boolean => {
         if (! isEditing) return false;
-        if (! country?.id) return false;
+        if (! tag?.id) return false;
 
-        router.delete(destroy({ country: country.id }).url, {
+        router.delete(destroy({ tag: tag.id }).url, {
             onSuccess: () => {
-                toast.success("Country deleted.");
-                onSuccess?.(country);
+                toast.success("Tag deleted.");
+                onSuccess?.(tag);
                 onClose?.();
             },
         });
         return true;
     }
 
-    const initialValues: Country = {
-        name: country?.name ?? "",
-        code: country?.code ?? "",
-        capital: country?.capital ?? "",
-        continent: country?.continent,
-        tags: country?.tags ?? [],
+    const initialValues: Tag = {
+        name: tag?.name ?? "",
+        color: tag?.color ?? "",
     };
 
     return (
         <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose?.(); }}>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                    <DialogTitle>{isEditing ? "Edit Country" : "New Country"}</DialogTitle>
+                    <DialogTitle>{isEditing ? "Edit Tag" : "New Tag"}</DialogTitle>
                     <DialogDescription>
                         {isEditing
-                            ? "Make changes to this country. Click save when you're done."
-                            : "Fill in the details for the new country."}
+                            ? "Make changes to this tag. Click save when you're done."
+                            : "Fill in the details for the new tag."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -81,8 +80,8 @@ export function CountryDialog({ country, open = false, onClose, onSuccess, onErr
                     initialValues={initialValues}
                     formAction={action}
                     onSuccess={() => {
-                        toast.success(isEditing ? "Country updated." : "Country created.");
-                        onSuccess?.(country as Country);
+                        toast.success(isEditing ? "Tag updated." : "Tag created.");
+                        onSuccess?.(tag);
                         onClose?.();
                     }}
                     onError={(errors) => {
@@ -90,8 +89,7 @@ export function CountryDialog({ country, open = false, onClose, onSuccess, onErr
                     }}
                     className="space-y-4"
                 >
-                    <CountryForm />
-
+                    <TagForm/>
                     <DialogFooter>
                         {isEditing ? <DeleteButton onClick={() => setConfirmDelete(true)}/> : null}
                         <DialogClose asChild>
