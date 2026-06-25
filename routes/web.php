@@ -4,6 +4,7 @@ use App\Http\Controllers\ContinentController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\TagController;
 use App\Models\Country;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,7 +14,9 @@ Route::get('/', function () {
     ]);
 });
 Route::get('/tags', function () {
-    return Inertia::render('tags');
+    return Inertia::render('tags', [
+        'tags_count' => Tag::count(),
+    ]);
 });
 Route::controller(CountryController::class)
     ->prefix('/countries')

@@ -45,13 +45,15 @@ class TagController extends Controller
 
     public function filter(Request $request)
     {
+        $tags = Tag::query()->withCount('countries')->orderBy('name');
         $comboboxMappingService = new ComboboxMappingService;
         return Response::json([
             'tags' => $comboboxMappingService->fromQuery(
-                Tag::query()->orderBy('name'),
+                $tags,
                 valueKey: 'name',
                 extraKeys: [
-                    'color'
+                    'color',
+                    'countries_count',
                 ]
             ),
         ]);

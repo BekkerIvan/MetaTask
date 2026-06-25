@@ -17,6 +17,8 @@ import ItemsPerPage from "@/components/items-per-page";
 import TagSelection from "@/components/tag-selection";
 import {index} from "@/actions/App/Http/Controllers/CountryController";
 import Pagination, { Link as PaginationLink } from "@/components/pagination";
+import {EyeIcon} from "lucide-react";
+import {RowSelectionDialog} from "@/components/dialogs/row-selection";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -34,6 +36,8 @@ interface PaginatedData<TData> {
 export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+    const [rowSelectionDialogOpen, setRowSelectionDialogOpen] = useState(false);
+    const selectedCount = Object.keys(rowSelection).length;
 
     const [data, setData] = useState<PaginatedData<TData>>({
         data: [],
@@ -121,8 +125,18 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                     placeholder="Search by name or capital…"
                 />
                 <Continents preload={true} onContinentChange={(value) => setContinent(value)}/>
-                <ItemsPerPage value={perPage} setValue={(value: string) => setPerPage(value)}/>
                 <TagSelection preload={true} onTagsChange={(tags: string[]) => setTags(tags)}/>
+                <ItemsPerPage value={perPage} setValue={(value: string) => setPerPage(value)}/>
+                <Button
+                    onClick={() => setRowSelectionDialogOpen(true)}
+                    disabled={selectedCount === 0}
+                >
+                    <EyeIcon />
+                    {selectedCount > 0 && (
+                        selectedCount
+                    )}
+                </Button>
+
             </div>
             <div className="overflow-hidden rounded-lg border border-border">
                 <Table>
@@ -190,6 +204,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                 </Table>
             </div>
             <Pagination links={data.links} onClick={(link) => setPage(link.page ?? 1)}/>
+            <RowSelectionDialog onClose={() => setRowSelectionDialogOpen(false)} rows={table.getSelectedRowModel()} open={rowSelectionDialogOpen}/>
         </>
     );
 }

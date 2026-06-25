@@ -38,7 +38,7 @@ export default function TagSelection({ tags_count = 0 }: Props) {
                 <div className="mx-auto max-w-5xl">
                     <div className="flex justify-between items-end mb-6">
                         <div>
-                            <h1 className="mb-1 text-xl font-bold text-foreground">Countries</h1>
+                            <h1 className="mb-1 text-xl font-bold text-foreground">Tags</h1>
                             <p className=" text-muted-foreground">
                                 {tags_count} {tags_count === 1 ? 'tag' : 'tags'}
                             </p>
@@ -54,11 +54,11 @@ export default function TagSelection({ tags_count = 0 }: Props) {
                             </Button>
                         </div>
                     </div>
+                    <DataTable
+                        columns={columns}
+                        onRowClick={handleRowClick}
+                    />
                 </div>
-                <DataTable
-                    columns={columns}
-                    onRowClick={handleRowClick}
-                />
                 <TagDialog
                     tag={tag}
                     open={tagDialogOpen}

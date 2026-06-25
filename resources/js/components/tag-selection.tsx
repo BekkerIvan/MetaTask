@@ -11,7 +11,7 @@ import {
     useComboboxAnchor,
     ComboboxInput,
 } from "@/components/ui/combobox";
-import React, {useEffect, useState} from "react";
+import React, {ReactElement, useEffect, useState} from "react";
 import { filter } from "@/actions/App/Http/Controllers/TagController";
 
 
@@ -29,7 +29,29 @@ export type TagOptions = {
     label: string;
     value: number | string;
     color: string;
+    countries_count?: number;
 };
+
+function TagLabel(tagOption: TagOptions): ReactElement {
+    let countryCount = null;
+
+    if (tagOption.countries_count) {
+        countryCount = (
+            <small className="ml-auto">({tagOption.countries_count})</small>
+        )
+    }
+
+    return (
+        <>
+            <span
+                className="inline-block w-3 h-3 rounded-full mr-2 shrink-0"
+                style={{ backgroundColor: tagOption.color }}
+            />
+            {tagOption.label}
+            {countryCount}
+        </>
+    );
+}
 
 export default function TagSelection({ preload = false, onTagsChange, tags = [], anchorRef, disabled = false, name, value }: Props<HTMLDivElement | null>) {
     const anchor = anchorRef ?? useComboboxAnchor();
@@ -62,8 +84,7 @@ export default function TagSelection({ preload = false, onTagsChange, tags = [],
                     {(selectedValues: string[]) => (
                         <React.Fragment>
                             {selectedValues.map((val) => {
-                                const label = tagOptions.find((t) => String(t.value) === String(val))?.label ?? val;
-                                return <ComboboxChip key={val}>{label}</ComboboxChip>;
+                                return <ComboboxChip key={val}>{val}</ComboboxChip>;
                             })}
                             <ComboboxChipsInput placeholder="TagSelection" />
                         </React.Fragment>
@@ -76,11 +97,7 @@ export default function TagSelection({ preload = false, onTagsChange, tags = [],
                 <ComboboxList>
                     {(tagOption: TagOptions) => (
                         <ComboboxItem key={tagOption.value} value={tagOption.value}>
-                                <span
-                                    className="inline-block w-3 h-3 rounded-full mr-2 shrink-0"
-                                    style={{ backgroundColor: tagOption.color }}
-                                />
-                            {tagOption.label}
+                            {TagLabel(tagOption)}
                         </ComboboxItem>
                     )}
                 </ComboboxList>

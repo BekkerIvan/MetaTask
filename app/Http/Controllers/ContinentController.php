@@ -18,8 +18,11 @@ class ContinentController extends Controller
 
         return Response::json([
             'continents' => $comboboxMappingService->fromQuery(
-                Continent::query()->orderBy('name'),
+                Continent::query()->withCount('countries')->orderBy('name'),
                 valueKey: 'name',
+                extraKeys: [
+                    'countries_count',
+                ]
             ),
         ]);
     }
