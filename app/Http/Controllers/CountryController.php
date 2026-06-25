@@ -44,10 +44,19 @@ class CountryController extends Controller
             ->when($continent, function ($query) use ($continent) {
                 $query->whereRelation('continent', 'name', $continent);
             })
-            ->when($tags, function ($query) use ($tags) {
-                $query->whereHas('tags', function ($query) use ($tags) {
-                    $query->whereIn('name', $tags);
-                });
+            ->when($tags, function ($query) use ($tags, $request) {
+                $tagMode = $request->query('tag_mode', 'and');
+                if ($tagMode === 'or') {
+                    $query->whereHas('tags', function ($query) use ($tags) {
+                        $query->whereIn('name', $tags);
+                    });
+                } else {
+                    foreach ($tags as $tag) {
+                        $query->whereHas('tags', function ($query) use ($tag) {
+                            $query->where('name', $tag);
+                        });
+                    }
+                }
             })
             ->orderBy($order, $direction)
             ->paginate($itemsPerPage, page: $page)

@@ -10,6 +10,7 @@ import {
     Table as TanstackTable
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
 import React, {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
@@ -34,6 +35,8 @@ interface PaginatedData<TData> {
     last_page: number;
     total: number;
 }
+
+type TagMode = 'and' | 'or'
 
 export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -60,6 +63,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
     const [tags, setTags] = useState<string[]>([]);
     const [page, setPage] = useState<number>(1);
     const [refresh, setRefresh] = useState<boolean>(false);
+    const [tagMode, setTagMode] = useState<TagMode>('and');
 
 
     useEffect(() => {
@@ -77,7 +81,8 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                 per_page: perPage,
                 continent,
                 tags,
-                page
+                page,
+                tag_mode: tagMode
             }
         }));
         setLoading(false);
@@ -91,7 +96,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
         return () => {
             setRefresh(false);
         }
-    }, [search, continent, order, direction, perPage, tags, page, refresh]);
+    }, [search, continent, order, direction, perPage, tags, page, refresh, tagMode]);
 
     const toggleSort = (column: string) => {
         if (order !== column) {
@@ -131,6 +136,16 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                 />
                 <Continents preload={true} onContinentChange={(value) => setContinent(value)}/>
                 <TagSelection preload={true} onTagsChange={(tags: string[]) => setTags(tags)}/>
+
+                <ToggleGroup
+                    type="single"
+                    value={tagMode}
+                    onValueChange={(tagMode: TagMode) => tagMode && setTagMode(tagMode)}
+                    className="border rounded-md"
+                >
+                    <ToggleGroupItem value="and" className="text-xs px-2">All</ToggleGroupItem>
+                    <ToggleGroupItem value="or"  className="text-xs px-2">Any</ToggleGroupItem>
+                </ToggleGroup>
                 <ItemsPerPage value={perPage} setValue={(value: string) => setPerPage(value)}/>
                 <TableActions table={table}
                               selectedRows={selectedCount}
