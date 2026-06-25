@@ -43,13 +43,19 @@ function TagLabel(tagOption: TagOptions): ReactElement {
 
     return (
         <>
-            <span
-                className="inline-block w-3 h-3 rounded-full mr-2 shrink-0"
-                style={{ backgroundColor: tagOption.color }}
-            />
+            {TagColorDot(tagOption.color)}
             {tagOption.label}
             {countryCount}
         </>
+    );
+}
+
+function TagColorDot(color: string): ReactElement {
+    return (
+        <span
+            className="inline-block w-3 h-3 rounded-full mr-1 shrink-0"
+            style={{ backgroundColor: color }}
+        />
     );
 }
 
@@ -84,7 +90,18 @@ export default function TagSelection({ preload = false, onTagsChange, tags = [],
                     {(selectedValues: string[]) => (
                         <React.Fragment>
                             {selectedValues.map((val) => {
-                                return <ComboboxChip key={val}>{val}</ComboboxChip>;
+                                const tag = tagOptions.find((t) => String(t.value) === String(val));
+                                return (
+                                    <ComboboxChip
+                                        key={val}
+                                        style={tag?.color ? { borderColor: tag.color } : undefined}
+                                    >
+                                        {tag ? (<>
+                                            {TagColorDot(tag.color)}
+                                            {tag.label}
+                                        </>) : val}
+                                    </ComboboxChip>
+                                );
                             })}
                             <ComboboxChipsInput placeholder="TagSelection" />
                         </React.Fragment>
