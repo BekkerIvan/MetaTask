@@ -6,7 +6,8 @@ import {
     useReactTable,
     SortingState,
     getSortedRowModel,
-    RowSelectionState
+    RowSelectionState,
+    Table as TanstackTable
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -17,8 +18,9 @@ import ItemsPerPage from "@/components/items-per-page";
 import TagSelection from "@/components/tag-selection";
 import {index} from "@/actions/App/Http/Controllers/CountryController";
 import Pagination, { Link as PaginationLink } from "@/components/pagination";
-import {EyeIcon} from "lucide-react";
 import {RowSelectionDialog} from "@/components/dialogs/row-selection";
+import {TableActions} from "@/components/country/data-tables/actions";
+import {BulkTagAllocationDialog} from "@/components/dialogs/bulk-tag-allocation";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -37,6 +39,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
     const [sorting, setSorting] = useState<SortingState>([]);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     const [rowSelectionDialogOpen, setRowSelectionDialogOpen] = useState(false);
+    const [bulkTagAllocationDialogOpen, setBulkTagAllocationDialogOpen] = useState(false);
     const selectedCount = Object.keys(rowSelection).length;
 
     const [data, setData] = useState<PaginatedData<TData>>({
@@ -56,6 +59,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
     const [loading, setLoading] = useState<boolean>(false);
     const [tags, setTags] = useState<string[]>([]);
     const [page, setPage] = useState<number>(1);
+    const [refresh, setRefresh] = useState<boolean>(false);
 
 
     useEffect(() => {
@@ -84,9 +88,10 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
         fetchData()
             .then(response => response.json())
             .then(data => setData(data.data))
-        return () => {}
-    }, [search, continent, order, direction, perPage, tags, page]);
-
+        return () => {
+            setRefresh(false);
+        }
+    }, [search, continent, order, direction, perPage, tags, page, refresh]);
 
     const toggleSort = (column: string) => {
         if (order !== column) {
@@ -102,7 +107,7 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
         setDirection('asc');
     };
 
-    const table = useReactTable({
+    const table: TanstackTable<TData> = useReactTable({
         data: data.data,
         columns,
         enableRowSelection: true,
@@ -127,16 +132,12 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
                 <Continents preload={true} onContinentChange={(value) => setContinent(value)}/>
                 <TagSelection preload={true} onTagsChange={(tags: string[]) => setTags(tags)}/>
                 <ItemsPerPage value={perPage} setValue={(value: string) => setPerPage(value)}/>
-                <Button
-                    onClick={() => setRowSelectionDialogOpen(true)}
-                    disabled={selectedCount === 0}
-                >
-                    <EyeIcon />
-                    {selectedCount > 0 && (
-                        selectedCount
-                    )}
-                </Button>
-
+                <TableActions table={table}
+                              selectedRows={selectedCount}
+                              actions={{
+                    viewRowsSelected: () => setRowSelectionDialogOpen(true),
+                    bulkTagAllocation: () => setBulkTagAllocationDialogOpen(true),
+                }}/>
             </div>
             <div className="overflow-hidden rounded-lg border border-border">
                 <Table>
@@ -205,6 +206,10 @@ export function DataTable<TData, TValue>({ columns, onRowClick }: DataTableProps
             </div>
             <Pagination links={data.links} onClick={(link) => setPage(link.page ?? 1)}/>
             <RowSelectionDialog onClose={() => setRowSelectionDialogOpen(false)} rows={table.getSelectedRowModel()} open={rowSelectionDialogOpen}/>
+            <BulkTagAllocationDialog onClose={() => {
+                setRefresh(true);
+                setBulkTagAllocationDialogOpen(false);
+            }} rows={table.getSelectedRowModel()} open={bulkTagAllocationDialogOpen}/>
         </>
     );
 }

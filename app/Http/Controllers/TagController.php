@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use App\Models\Tag;
 use App\Services\ComboboxMappingService;
 use App\Validation\TagValidation;
@@ -47,6 +48,7 @@ class TagController extends Controller
     {
         $tags = Tag::query()->withCount('countries')->orderBy('name');
         $comboboxMappingService = new ComboboxMappingService;
+
         return Response::json([
             'tags' => $comboboxMappingService->fromQuery(
                 $tags,
@@ -99,5 +101,19 @@ class TagController extends Controller
         $tag->delete();
 
         return Inertia::back();
+    }
+
+    public function bulk(Request $request)
+    {
+        $validated = $request->validate([
+            'tags' => 'array|exists:tags,name',
+            'countries' => 'array|exists:countries,id',
+        ]);
+        $tags = Tag::whereIn('name', $validated['tags'])->pluck('id');
+        $countries = Country::findMany($validated['countries']);
+
+        foreach ($countries as $country) {
+            $country->tags()->sync($tags);
+        }
     }
 }

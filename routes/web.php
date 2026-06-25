@@ -36,6 +36,7 @@ Route::controller(TagController::class)
         Route::post('', 'store')->name('store');
         Route::delete('/{tag}', 'destroy')->name('destroy');
         Route::get('/filter', 'filter')->name('filter');
+        Route::post('/bulk', 'bulk')->name('bulk');
     });
 Route::controller(ContinentController::class)
     ->prefix('/continents')
